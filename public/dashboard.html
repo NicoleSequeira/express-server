@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/projects">Projects</a>
+        <a href="/guestbook">Guestbook</a>
+        <a href="/space">Space</a>
+    </nav>
+
+    <h1>Welcome to My Express App</h1>
+    <p>This is a simple HTML page served by Express.</p>
+
+    <p id="status"></p>
+
+    <div id="login-section" hidden>
+        <h2>Login</h2>
+
+        <form id="login-form" action="/login" method="post">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" required>
+
+            <label>
+                <input type="checkbox" name="rememberMe" />
+                Remember me
+            </label>
+
+            <button type="submit">Log in</button>
+        </form>
+
+        <p id="login-message" role="status"></p>
+    </div>
+
+    <button id="logout-button" type="button">Log Out</button>
+
+    <script>
+        const logoutButton = document.querySelector('#logout-button');
+
+        logoutButton.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/logout', {
+                    method: 'POST'
+                });
+
+                const data = await response
+                    .json()
+                    .catch(() => ({ success: false }));
+
+                if (data.success) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        });
+    </script>
+</body>
+
+</html>

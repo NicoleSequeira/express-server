@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guestbook</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/projects">Projects</a>
+        <a href="/guestbook">Guestbook</a>
+        <a href="/space">Space</a>
+    </nav>
+
+    <h1>Guestbook</h1>
+
+    <p id="list-error" role="alert"></p>
+    <ul id="guestbook-list"></ul>
+
+    <form id="guestbook-form">
+        <label for="name">Name</label>
+        <input id="name" type="text" name="name" maxlength="40" required />
+
+        <label for="msg">Message</label>
+        <textarea id="msg" name="msg" maxlength="280" required></textarea>
+
+        <button type="submit">Post</button>
+    </form>
+    <p id="form-error" role="alert"></p>
+
+    <button id="logout-button" type="button">Log Out</button>
+
+    <script>
+
+        const logoutButton = document.querySelector('#logout-button');
+
+        logoutButton.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/logout', {
+                    method: 'POST'
+                });
+
+                const data = await response
+                    .json()
+                    .catch(() => ({ success: false }));
+
+                if (data.success) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        });
+    </script>
+
+    <script src="/script/guestbook.js"></script>
+</body>
+
+</html>

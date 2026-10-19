@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express Server</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/projects">Projects</a>
+        <a href="/guestbook">Guestbook</a>
+        <a href="/space">Space</a>
+    </nav>
+    <h1>Express Server</h1>
+    <p>Welcome to the express server</p>
+
+    <div id="status">
+        <h2>Welcome!</h2>
+    </div>
+
+    <div id="login-section">
+        <h2>Login</h2>
+
+        <form id="login-form" action="/login" method="post">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" required>
+
+            <label class="remember-me">
+                <input type="checkbox" id="rememberMe" name="rememberMe">
+                Remember me
+            </label>
+
+            <button type="submit">Log In</button>
+        </form>
+
+        <p id="login-message"></p>
+    </div>
+
+    <button id="logout-button" type="button" hidden>
+        Log Out
+    </button>
+
+    <script src="./script/login.js"></script>
+    <script src="./script/logout.js"></script>
+</body>
+
+</html>
