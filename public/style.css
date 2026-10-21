@@ -258,12 +258,12 @@ textarea:focus-visible {
 
 /* Guestbook box */
 body>#guestbook-section {
-    width: 360px;
+    width: 320px;
     max-width: calc(100vw - 32px);
     min-width: 0;
     margin-right: auto;
     margin-left: auto;
-    padding: 20px 16px;
+    padding: 18px 14px;
     overflow: hidden;
     align-self: center;
     background: var(--white);
@@ -636,8 +636,8 @@ body>#guestbook-section {
     }
 
     body>#guestbook-section {
-        width: min(360px, calc(100vw - 28px));
-        padding: 18px 14px;
+        width: min(320px, calc(100vw - 28px));
+        padding: 16px 12px;
     }
 
     #guestbook-list {
