@@ -1,0 +1,28 @@
+<nav>
+    <a href="/">Home</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/projects">Projects</a>
+    <a href="/guestbook">Guestbook</a>
+    <a href="/space">Space</a>
+</nav>
+
+<h1>Space Picture of the Day</h1>
+
+<form id="space-form">
+    <label for="date">Pick a date</label>
+    <input type="date" id="date" min="1995-06-16" />
+    <button type="submit">Show picture</button>
+    <link rel="stylesheet" href="style.css">
+</form>
+
+<p id="status" role="status"></p>
+
+<article id="result" hidden>
+    <h2 id="title"></h2>
+    <p id="date-shown"></p>
+    <img id="picture" />
+    <p id="description"></p>
+    <a id="nasa-link" target="_blank" rel="noopener">Read the full story on NASA's website</a>
+</article>
+
+<script src="./script/space.js"></script>
