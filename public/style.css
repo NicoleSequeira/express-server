@@ -258,8 +258,7 @@ textarea:focus-visible {
 
 /* Guestbook box */
 body>#guestbook-section {
-    width: 320px;
-    max-width: calc(100vw - 32px);
+    width: min(520px, 100%);
     min-width: 0;
     margin-right: auto;
     margin-left: auto;
@@ -636,7 +635,7 @@ body>#guestbook-section {
     }
 
     body>#guestbook-section {
-        width: min(320px, calc(100vw - 28px));
+        width: min(520px, calc(100vw - 28px));
         padding: 16px 12px;
     }
 
