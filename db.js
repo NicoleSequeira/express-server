@@ -3,13 +3,14 @@ const path = require('path');
 const crypto = require('crypto');
 
 const GUESTBOOK_FILE = path.join(__dirname, 'guestbook.json');
+const USERS_FILE = path.join(__dirname, 'users.json');
 const MAX_ENTRIES = 50;
 
 // ----- Private helpers (not exported) -----
 
-async function readAll() {
+async function readAll(file = GUESTBOOK_FILE) {
     try {
-        const text = await fs.readFile(GUESTBOOK_FILE, 'utf8');
+        const text = await fs.readFile(file, 'utf8');
         return JSON.parse(text);
     } catch (err) {
         if (err.code === 'ENOENT') return []; // file doesn't exist yet
@@ -17,8 +18,8 @@ async function readAll() {
     }
 }
 
-async function writeAll(entries) {
-    await fs.writeFile(GUESTBOOK_FILE, JSON.stringify(entries, null, 2));
+async function writeAll(entries, file = GUESTBOOK_FILE) {
+    await fs.writeFile(file, JSON.stringify(entries, null, 2));
 }
 
 // ----- Public functions (exported) -----
@@ -28,9 +29,10 @@ async function getAllEntries() {
 }
 
 async function getEntryById(id) {
-    const result = await pool.query('SELECT * FROM entries WHERE id = $1', [id]);
-    return result.rows[0] || null;
+    const entries = await readAll();
+    return entries.find(entry => entry.id === id) || null;
 }
+
 async function addEntry({ name, msg }) {
     const entries = await readAll();
     const entry = {
@@ -65,4 +67,35 @@ async function deleteEntry(id) {
     return true;
 }
 
-module.exports = { getAllEntries, getEntryById, addEntry, updateEntry, deleteEntry };
+async function getUserByUsername(username) {
+    if (typeof username !== 'string') return null;
+    const normalized = username.trim().toLowerCase();
+    if (!normalized) return null;
+
+    const users = await readAll(USERS_FILE);
+    return users.find(user => user.username === normalized) || null;
+}
+
+async function addUser({ username, passwordHash, role = 'user' }) {
+    const users = await readAll(USERS_FILE);
+    const user = {
+        id: crypto.randomUUID(),
+        username: username.trim().toLowerCase(),
+        passwordHash,
+        role,
+        createdAt: new Date().toISOString()
+    };
+    users.push(user);
+    await writeAll(users, USERS_FILE);
+    return user;
+}
+
+module.exports = {
+    getAllEntries,
+    getEntryById,
+    addEntry,
+    updateEntry,
+    deleteEntry,
+    getUserByUsername,
+    addUser
+};

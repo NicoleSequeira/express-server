@@ -11,8 +11,13 @@ async function checkAuthState() {
         const data = await response.json();
 
         if (data.loggedIn) {
-            status.innerHTML =
-                '<h1>Welcome back!</h1><a href="/dashboard">Dashboard</a>';
+            status.textContent = '';
+            const heading = document.createElement('h1');
+            heading.textContent = `Welcome back, ${data.username}!`;
+            const dashboardLink = document.createElement('a');
+            dashboardLink.href = '/dashboard';
+            dashboardLink.textContent = 'Dashboard';
+            status.append(heading, dashboardLink);
 
             loginSection.hidden = true;
             logoutButton.hidden = false;
@@ -33,6 +38,7 @@ async function checkAuthState() {
 loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
+    const username = document.querySelector('#username').value;
     const password = document.querySelector('#password').value;
     const rememberMe = document.querySelector('#rememberMe').checked;
 
@@ -43,6 +49,7 @@ loginForm.addEventListener('submit', async (event) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                username,
                 password,
                 rememberMe
             })
@@ -59,7 +66,7 @@ loginForm.addEventListener('submit', async (event) => {
             window.location.href = data.redirect || '/dashboard';
         } else {
             loginMessage.textContent =
-                data.error || 'Login failed. Please check your password.';
+                data.error || 'Login failed. Please check your credentials.';
         }
     } catch (error) {
         console.error('Login failed:', error);
@@ -67,4 +74,3 @@ loginForm.addEventListener('submit', async (event) => {
             'Unable to log in. Please try again.';
     }
 });
-
