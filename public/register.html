@@ -1,19 +1,33 @@
-<h1>Create an account</h1>
+<!DOCTYPE html>
+<html lang="en">
 
-<form id="register-form">
-    <label for="username">Username</label>
-    <input id="username" autocomplete="username" minlength="3" maxlength="20" required />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 
-    <label for="password">Password (at least 8 characters)</label>
-    <input id="password" type="password" autocomplete="new-password" minlength="8" maxlength="72" required />
+<body>
+    <h1>Create an account</h1>
 
-    <label for="confirm">Confirm password</label>
-    <input id="confirm" type="password" autocomplete="new-password" required />
+    <form id="register-form">
+        <label for="username">Username</label>
+        <input id="username" autocomplete="username" minlength="3" maxlength="20" required />
 
-    <button type="submit">Create account</button>
-</form>
-<p id="register-message" role="alert"></p>
+        <label for="password">Password (at least 8 characters)</label>
+        <input id="password" type="password" autocomplete="new-password" minlength="8" maxlength="72" required />
 
-<p>Already have an account? <a href="/">Log in</a></p>
+        <label for="confirm">Confirm password</label>
+        <input id="confirm" type="password" autocomplete="new-password" required />
 
-<script src="/js/register.js"></script>
+        <button type="submit">Create account</button>
+    </form>
+    <p id="register-message" role="alert"></p>
+
+    <p>Already have an account? <a href="/">Log in</a></p>
+
+    <script src="/script/register.js"></script>
+</body>
+
+</html>
