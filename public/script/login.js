@@ -12,11 +12,14 @@ async function checkAuthState() {
 
         if (data.loggedIn) {
             status.textContent = '';
+
             const heading = document.createElement('h1');
             heading.textContent = `Welcome back, ${data.username}!`;
+
             const dashboardLink = document.createElement('a');
             dashboardLink.href = '/dashboard';
             dashboardLink.textContent = 'Dashboard';
+
             status.append(heading, dashboardLink);
 
             loginSection.hidden = true;
@@ -38,12 +41,14 @@ async function checkAuthState() {
 loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
+    loginMessage.textContent = '';
+
     const username = document.querySelector('#username').value;
     const password = document.querySelector('#password').value;
     const rememberMe = document.querySelector('#rememberMe').checked;
 
     try {
-        const response = await fetch(loginForm.action, {
+        const response = await fetch('/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -57,20 +62,23 @@ loginForm.addEventListener('submit', async (event) => {
 
         const data = await response
             .json()
-            .catch(() => ({ success: false }));
+            .catch(() => ({}));
 
-        if (data.success) {
-            loginMessage.textContent = 'Login successful!';
-            loginForm.reset();
-
-            window.location.href = data.redirect || '/dashboard';
-        } else {
+        if (!response.ok) {
             loginMessage.textContent =
-                data.error || 'Login failed. Please check your credentials.';
+                data.error || 'Login failed. Please try again.';
+            return;
         }
+
+        loginMessage.textContent = 'Login successful!';
+        loginForm.reset();
+
+        window.location.href = '/guestbook';
     } catch (error) {
         console.error('Login failed:', error);
         loginMessage.textContent =
             'Unable to log in. Please try again.';
     }
 });
+
+checkAuthState();

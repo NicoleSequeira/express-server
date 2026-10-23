@@ -6,88 +6,90 @@ const GUESTBOOK_FILE = path.join(__dirname, 'guestbook.json');
 const USERS_FILE = path.join(__dirname, 'users.json');
 const MAX_ENTRIES = 50;
 
-// ----- Private helpers (not exported) -----
-
 async function readAll(file = GUESTBOOK_FILE) {
     try {
         const text = await fs.readFile(file, 'utf8');
         return JSON.parse(text);
     } catch (err) {
-        if (err.code === 'ENOENT') return []; // file doesn't exist yet
-        throw err; // anything else is a real problem for the error handler
+        if (err.code === 'ENOENT') return [];
+        throw err;
     }
 }
 
-async function writeAll(entries, file = GUESTBOOK_FILE) {
-    await fs.writeFile(file, JSON.stringify(entries, null, 2));
+async function writeAll(data, file = GUESTBOOK_FILE) {
+    await fs.writeFile(file, JSON.stringify(data, null, 2));
 }
 
-// ----- Public functions (exported) -----
+async function getUserByUsername(username) {
+    const users = await readAll(USERS_FILE);
+    return users.find(
+        user => user.username === username.toLowerCase()
+    ) || null;
+}
+
+// Takes a passwordHash, never a password
+async function addUser({ username, passwordHash, role = 'user' }) {
+    const users = await readAll(USERS_FILE);
+
+    const user = {
+        id: crypto.randomUUID(),
+        username: username.toLowerCase(),
+        passwordHash,
+        role,
+        createdAt: new Date().toISOString()
+    };
+
+    users.push(user);
+    await writeAll(users, USERS_FILE);
+    return user;
+}
 
 async function getAllEntries() {
-    return readAll();
+    return readAll(GUESTBOOK_FILE);
 }
 
 async function getEntryById(id) {
-    const entries = await readAll();
+    const entries = await readAll(GUESTBOOK_FILE);
     return entries.find(entry => entry.id === id) || null;
 }
 
 async function addEntry({ name, msg }) {
-    const entries = await readAll();
+    const entries = await readAll(GUESTBOOK_FILE);
+
     const entry = {
         id: crypto.randomUUID(),
         name,
         msg,
         createdAt: new Date().toISOString()
     };
+
     entries.push(entry);
-    await writeAll(entries.slice(-MAX_ENTRIES));
+    await writeAll(entries.slice(-MAX_ENTRIES), GUESTBOOK_FILE);
     return entry;
 }
 
 async function updateEntry(id, { name, msg }) {
-    const entries = await readAll();
-    const entry = entries.find(e => e.id === id);
+    const entries = await readAll(GUESTBOOK_FILE);
+    const entry = entries.find(entry => entry.id === id);
+
     if (!entry) return null;
 
     entry.name = name;
     entry.msg = msg;
     entry.updatedAt = new Date().toISOString();
-    await writeAll(entries);
+
+    await writeAll(entries, GUESTBOOK_FILE);
     return entry;
 }
 
 async function deleteEntry(id) {
-    const entries = await readAll();
-    const remaining = entries.filter(e => e.id !== id);
-    if (remaining.length === entries.length) return false; // nothing matched
+    const entries = await readAll(GUESTBOOK_FILE);
+    const remaining = entries.filter(entry => entry.id !== id);
 
-    await writeAll(remaining);
+    if (remaining.length === entries.length) return false;
+
+    await writeAll(remaining, GUESTBOOK_FILE);
     return true;
-}
-
-async function getUserByUsername(username) {
-    if (typeof username !== 'string') return null;
-    const normalized = username.trim().toLowerCase();
-    if (!normalized) return null;
-
-    const users = await readAll(USERS_FILE);
-    return users.find(user => user.username === normalized) || null;
-}
-
-async function addUser({ username, passwordHash, role = 'user' }) {
-    const users = await readAll(USERS_FILE);
-    const user = {
-        id: crypto.randomUUID(),
-        username: username.trim().toLowerCase(),
-        passwordHash,
-        role,
-        createdAt: new Date().toISOString()
-    };
-    users.push(user);
-    await writeAll(users, USERS_FILE);
-    return user;
 }
 
 module.exports = {

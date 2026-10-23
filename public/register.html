@@ -1,44 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
+<h1>Create an account</h1>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <link rel="stylesheet" href="/style.css">
-</head>
+<form id="register-form">
+    <label for="username">Username</label>
+    <input id="username" autocomplete="username" minlength="3" maxlength="20" required />
 
-<body>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/dashboard">Dashboard</a>
-        <a href="/projects">Projects</a>
-        <a href="/guestbook">Guestbook</a>
-        <a href="/space">Space</a>
-    </nav>
+    <label for="password">Password (at least 8 characters)</label>
+    <input id="password" type="password" autocomplete="new-password" minlength="8" maxlength="72" required />
 
-    <h1>Create Account</h1>
+    <label for="confirm">Confirm password</label>
+    <input id="confirm" type="password" autocomplete="new-password" required />
 
-    <form id="register-form" action="/register" method="post">
-        <label for="username">Username</label>
-        <input id="username" name="username" type="text" required minlength="3" maxlength="20"
-            pattern="[a-z0-9_]{3,20}" autocomplete="username">
+    <button type="submit">Create account</button>
+</form>
+<p id="register-message" role="alert"></p>
 
-        <label for="password">Password</label>
-        <input id="password" name="password" type="password" required minlength="8" maxlength="72"
-            autocomplete="new-password">
+<p>Already have an account? <a href="/">Log in</a></p>
 
-        <label for="confirmPassword">Confirm password</label>
-        <input id="confirmPassword" name="confirmPassword" type="password" required minlength="8" maxlength="72"
-            autocomplete="new-password">
-
-        <button type="submit">Register</button>
-    </form>
-
-    <p id="register-message" role="alert"></p>
-    <p><a href="/">Back to login</a></p>
-
-    <script src="/js/register.js"></script>
-</body>
-
-</html>
+<script src="/js/register.js"></script>

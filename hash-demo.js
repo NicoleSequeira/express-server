@@ -1,22 +1,14 @@
 const bcrypt = require('bcryptjs');
 
-async function run() {
-    const password = 'CorrectHorseBatteryStaple!';
+async function demo() {
+    const hash1 = await bcrypt.hash('password123', 12);
+    const hash2 = await bcrypt.hash('password123', 12);
+    console.log('Hash 1:', hash1);
+    console.log('Hash 2:', hash2);
 
-    const hashA = await bcrypt.hash(password, 12);
-    const hashB = await bcrypt.hash(password, 12);
-
-    console.log('Hash A:', hashA);
-    console.log('Hash B:', hashB);
-    console.log('A verifies:', await bcrypt.compare(password, hashA));
-    console.log('B verifies:', await bcrypt.compare(password, hashB));
+    console.log('Right password, hash 1:', await bcrypt.compare('password123', hash1));
+    console.log('Right password, hash 2:', await bcrypt.compare('password123', hash2));
+    console.log('Wrong password, hash 1:', await bcrypt.compare('password124', hash1));
 }
 
-run().catch((error) => {
-    console.error('Hash demo failed:', error);
-    process.exit(1);
-});
-
-// 1) Salts make equal passwords produce different hashes while both still verify.
-// 2) You cannot recover the original password from a bcrypt hash.
-// 3) Bcrypt is intentionally slow, making large-scale password guessing expensive.
+demo();
