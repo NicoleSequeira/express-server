@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const REQUIRED_ENV = ['SESSION_SECRET', 'APP_PASSWORD', 'NASA_API_KEY'];
+const REQUIRED_ENV = ['SESSION_SECRET', 'NASA_API_KEY', 'ADMIN_USERNAME', 'ADMIN_PASSWORD'];
 
 for (const name of REQUIRED_ENV) {
     if (!process.env[name]) {
@@ -12,6 +12,7 @@ for (const name of REQUIRED_ENV) {
 const express = require('express');
 const session = require('express-session');
 const rateLimit = require('express-rate-limit');
+const bcrypt = require('bcryptjs');
 
 
 const fs = require('fs');
@@ -96,6 +97,41 @@ function validateApodDate(date) {
     return null;
 }
 
+function validateCredentials(username, password) {
+    if (typeof username !== 'string' || typeof password !== 'string') {
+        return { error: 'Username and password are required.' };
+    }
+
+    const normalizedUsername = username.trim().toLowerCase();
+    if (!/^[a-z0-9_]{3,20}$/.test(normalizedUsername)) {
+        return { error: 'Username must be 3-20 characters using lowercase letters, numbers, or underscores.' };
+    }
+
+    if (password.length < 8 || password.length > 72) {
+        return { error: 'Password must be 8-72 characters.' };
+    }
+
+    return { username: normalizedUsername, password };
+}
+
+function startSession(req, user, rememberMe) {
+    return new Promise((resolve, reject) => {
+        req.session.regenerate((error) => {
+            if (error) return reject(error);
+
+            req.session.userId = user.id;
+            req.session.username = user.username;
+            req.session.role = user.role;
+
+            if (rememberMe) {
+                req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000;
+            }
+
+            resolve();
+        });
+    });
+}
+
 const GUESTBOOK_FILE = path.join(__dirname, 'guestbook.json');
 
 function getGuestbookMessages() {
@@ -162,15 +198,25 @@ app.use(session({
 // Route guard - use this on any route that should require login.
 // Example: app.get('/dashboard', requireAuth, (req, res) => { ... });
 function requireAuth(req, res, next) {
-    if (!req.session.isAuthenticated) {
+    if (!req.session.userId) {
         return res.status(401).json({ error: 'Please log in first.' });
     }
     next();
 }
 
 function requireLoginPage(req, res, next) {
-    if (!req.session.isAuthenticated) {
+    if (!req.session.userId) {
         return res.redirect('/');
+    }
+    next();
+}
+
+function requireAdminPage(req, res, next) {
+    if (!req.session.userId) {
+        return res.redirect('/');
+    }
+    if (req.session.role !== 'admin') {
+        return res.status(403).send('<h1>Forbidden</h1><p>Admin access required.</p><a href="/">Back to home</a>');
     }
     next();
 }
@@ -321,27 +367,63 @@ app.get('/api/stats', (req, res) => {
     res.json({ visitorCount });
 });
 
-// Checks the password against .env; marks the session authenticated if correct
-app.post('/login', authLimiter, (req, res) => {
-    const { password, rememberMe } = req.body;
+app.post('/register', authLimiter, async (req, res, next) => {
+    try {
+        const { username, password, rememberMe } = req.body;
+        const validated = validateCredentials(username, password);
 
-    if (password === process.env.APP_PASSWORD) {
-        req.session.isAuthenticated = true;
-
-        if (rememberMe) {
-            req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+        if (validated.error) {
+            return res.status(400).json({ success: false, error: validated.error });
         }
 
+        const existing = await db.getUserByUsername(validated.username);
+        if (existing) {
+            return res.status(409).json({ success: false, error: 'That username is already taken.' });
+        }
+
+        const passwordHash = await bcrypt.hash(validated.password, 12);
+        const user = await db.addUser({
+            username: validated.username,
+            passwordHash,
+            role: 'user'
+        });
+
+        await startSession(req, user, Boolean(rememberMe));
+        return res.status(201).json({ success: true, redirect: '/guestbook' });
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.post('/login', authLimiter, async (req, res, next) => {
+    try {
+        const { username, password, rememberMe } = req.body;
+        const validated = validateCredentials(username, password);
+
+        if (validated.error) {
+            return res.status(400).json({ success: false, error: validated.error });
+        }
+
+        const user = await db.getUserByUsername(validated.username);
+        const validPassword = user
+            ? await bcrypt.compare(validated.password, user.passwordHash)
+            : false;
+
+        if (!user || !validPassword) {
+            return res.status(401).json({
+                success: false,
+                error: 'Invalid username or password.'
+            });
+        }
+
+        await startSession(req, user, Boolean(rememberMe));
         return res.status(200).json({
             success: true,
-            redirect: '/dashboard'
+            redirect: user.role === 'admin' ? '/dashboard' : '/guestbook'
         });
+    } catch (error) {
+        next(error);
     }
-
-    res.status(401).json({
-        success: false,
-        error: 'Incorrect password'
-    });
 });
 
 app.post('/logout', (req, res) => {
@@ -359,7 +441,7 @@ app.post('/logout', (req, res) => {
 });
 
 // Example protected route - try visiting this without logging in first
-app.get('/dashboard', requireLoginPage, (req, res) => {
+app.get('/dashboard', requireLoginPage, requireAdminPage, (req, res) => {
     // res.send('<h1>Dashboard</h1><p>You are logged in!</p>');
     res.sendFile(path.join(PUBLIC_DIR, 'dashboard.html'));
 });
@@ -376,7 +458,16 @@ app.get('/about', (req, res) => {
 });
 
 app.get('/api/whoami', (req, res) => {
-    res.json({ loggedIn: !!req.session.isAuthenticated })
+    if (!req.session.userId) {
+        return res.json({ loggedIn: false });
+    }
+
+    res.json({
+        loggedIn: true,
+        userId: req.session.userId,
+        username: req.session.username,
+        role: req.session.role
+    });
 });
 
 app.get('/health', (req, res) => {
@@ -434,4 +525,28 @@ app.use((err, req, res, next) => {
 
 
 
-app.listen(PORT, () => console.log(`Server live on http://localhost:${PORT}`));
+async function ensureAdmin() {
+    const validation = validateCredentials(process.env.ADMIN_USERNAME, process.env.ADMIN_PASSWORD);
+    if (validation.error) {
+        throw new Error(`Invalid ADMIN credentials: ${validation.error}`);
+    }
+
+    const existingAdmin = await db.getUserByUsername(validation.username);
+    if (existingAdmin) return;
+
+    const passwordHash = await bcrypt.hash(validation.password, 12);
+    await db.addUser({
+        username: validation.username,
+        passwordHash,
+        role: 'admin'
+    });
+}
+
+ensureAdmin()
+    .then(() => {
+        app.listen(PORT, () => console.log(`Server live on http://localhost:${PORT}`));
+    })
+    .catch((error) => {
+        console.error('Startup failed:', error);
+        process.exit(1);
+    });

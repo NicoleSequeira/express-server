@@ -27,8 +27,13 @@
         <h2>Login</h2>
 
         <form id="login-form" action="/login" method="post">
+            <label for="username">Username</label>
+            <input id="username" name="username" type="text" required minlength="3" maxlength="20" autocomplete="username"
+                pattern="[a-z0-9_]{3,20}">
+
             <label for="password">Password</label>
-            <input id="password" name="password" type="password" required>
+            <input id="password" name="password" type="password" required minlength="8" maxlength="72"
+                autocomplete="current-password">
 
             <label class="remember-me">
                 <input type="checkbox" id="rememberMe" name="rememberMe">
@@ -39,6 +44,7 @@
         </form>
 
         <p id="login-message"></p>
+        <p><a href="/register">Need an account? Register</a></p>
     </div>
 
     <button id="logout-button" type="button" hidden>
