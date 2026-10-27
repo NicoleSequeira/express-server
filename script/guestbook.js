@@ -3,6 +3,8 @@ const guestbookList = document.querySelector('#guestbook-list');
 const formError = document.querySelector('#form-error');
 const listError = document.querySelector('#list-error');
 
+let currentUser = null;
+
 async function deleteEntry(id) {
     if (!confirm('Delete this message?')) return;
 
@@ -41,10 +43,7 @@ async function saveEdit(entry, newMsg) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    name: entry.name,
-                    msg: newMsg
-                })
+                body: JSON.stringify({ msg: document.querySelector('#msg').value })
             }
         );
 
@@ -106,26 +105,37 @@ function createEntryElement(entry) {
         li.append(edited);
     }
 
-    const editButton = document.createElement('button');
-    editButton.type = 'button';
-    editButton.textContent = 'Edit';
-    editButton.addEventListener('click', () => {
-        startEdit(li, entry);
-    });
+    const canEdit =
+        entry.authorId === currentUser.userId ||
+        currentUser.role === 'admin';
 
-    const deleteButton = document.createElement('button');
-    deleteButton.type = 'button';
-    deleteButton.textContent = 'Delete';
-    deleteButton.addEventListener('click', () => {
-        deleteEntry(entry.id);
-    });
+    if (canEdit) {
+        const editButton = document.createElement('button');
+        editButton.type = 'button';
+        editButton.textContent = 'Edit';
+        editButton.addEventListener('click', () => {
+            startEdit(li, entry);
+        });
 
-    li.append(editButton, deleteButton);
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => {
+            deleteEntry(entry.id);
+        });
+
+        li.append(editButton, deleteButton);
+    }
 
     return li;
 }
 
 async function loadMessages() {
+
+    if (!currentUser) {
+        currentUser = await (await fetch('/api/whoami')).json();
+    }
+
     listError.textContent = '';
 
     try {
@@ -154,10 +164,7 @@ guestbookForm.addEventListener('submit', async (event) => {
 
     formError.textContent = '';
 
-    const nameInput = document.querySelector('#name');
     const messageInput = document.querySelector('#msg');
-
-    const name = nameInput.value.trim();
     const msg = messageInput.value.trim();
 
     try {
@@ -166,10 +173,7 @@ guestbookForm.addEventListener('submit', async (event) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                name,
-                msg
-            })
+            body: JSON.stringify({ msg: document.querySelector('#msg').value })
         });
 
         const data = await response.json().catch(() => ({}));

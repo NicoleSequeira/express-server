@@ -11,8 +11,16 @@ async function checkAuthState() {
         const data = await response.json();
 
         if (data.loggedIn) {
-            status.innerHTML =
-                '<h1>Welcome back!</h1><a href="/dashboard">Dashboard</a>';
+            status.textContent = '';
+
+            const heading = document.createElement('h1');
+            heading.textContent = `Welcome back, ${data.username}!`;
+
+            const dashboardLink = document.createElement('a');
+            dashboardLink.href = '/dashboard';
+            dashboardLink.textContent = 'Dashboard';
+
+            status.append(heading, dashboardLink);
 
             loginSection.hidden = true;
             logoutButton.hidden = false;
@@ -33,16 +41,20 @@ async function checkAuthState() {
 loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
+    loginMessage.textContent = '';
+
+    const username = document.querySelector('#username').value;
     const password = document.querySelector('#password').value;
     const rememberMe = document.querySelector('#rememberMe').checked;
 
     try {
-        const response = await fetch(loginForm.action, {
+        const response = await fetch('/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                username,
                 password,
                 rememberMe
             })
@@ -50,17 +62,18 @@ loginForm.addEventListener('submit', async (event) => {
 
         const data = await response
             .json()
-            .catch(() => ({ success: false }));
+            .catch(() => ({}));
 
-        if (data.success) {
-            loginMessage.textContent = 'Login successful!';
-            loginForm.reset();
-
-            window.location.href = data.redirect || '/dashboard';
-        } else {
+        if (!response.ok) {
             loginMessage.textContent =
-                data.error || 'Login failed. Please check your password.';
+                data.error || 'Login failed. Please try again.';
+            return;
         }
+
+        loginMessage.textContent = 'Login successful!';
+        loginForm.reset();
+
+        window.location.href = '/guestbook';
     } catch (error) {
         console.error('Login failed:', error);
         loginMessage.textContent =
@@ -68,3 +81,4 @@ loginForm.addEventListener('submit', async (event) => {
     }
 });
 
+checkAuthState();

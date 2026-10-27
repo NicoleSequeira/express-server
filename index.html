@@ -16,6 +16,7 @@
         <a href="/guestbook">Guestbook</a>
         <a href="/space">Space</a>
     </nav>
+
     <h1>Express Server</h1>
     <p>Welcome to the express server</p>
 
@@ -27,8 +28,16 @@
         <h2>Login</h2>
 
         <form id="login-form" action="/login" method="post">
+            <label for="username">Username</label>
+            <input id="username" name="username" autocomplete="username" required>
+
             <label for="password">Password</label>
-            <input id="password" name="password" type="password" required>
+            <input id="password" name="password" type="password" autocomplete="current-password" required>
+
+            <p>
+                New here?
+                <a href="/register">Create an account</a>
+            </p>
 
             <label class="remember-me">
                 <input type="checkbox" id="rememberMe" name="rememberMe">
@@ -38,15 +47,15 @@
             <button type="submit">Log In</button>
         </form>
 
-        <p id="login-message"></p>
+        <p id="login-message" role="alert"></p>
     </div>
 
     <button id="logout-button" type="button" hidden>
         Log Out
     </button>
 
-    <script src="./script/login.js"></script>
-    <script src="./script/logout.js"></script>
+    <script src="/script/login.js"></script>
+    <script src="/script/logout.js"></script>
 </body>
 
 </html>

@@ -23,8 +23,6 @@
     <ul id="guestbook-list"></ul>
 
     <form id="guestbook-form">
-        <label for="name">Name</label>
-        <input id="name" type="text" name="name" maxlength="40" required />
 
         <label for="msg">Message</label>
         <textarea id="msg" name="msg" maxlength="280" required></textarea>
@@ -35,30 +33,9 @@
 
     <button id="logout-button" type="button">Log Out</button>
 
-    <script>
-
-        const logoutButton = document.querySelector('#logout-button');
-
-        logoutButton.addEventListener('click', async () => {
-            try {
-                const response = await fetch('/logout', {
-                    method: 'POST'
-                });
-
-                const data = await response
-                    .json()
-                    .catch(() => ({ success: false }));
-
-                if (data.success) {
-                    window.location.href = '/';
-                }
-            } catch (error) {
-                console.error('Logout failed:', error);
-            }
-        });
-    </script>
 
     <script src="/script/guestbook.js"></script>
+    <script src="/script/logout.js"></script>
 </body>
 
 </html>
