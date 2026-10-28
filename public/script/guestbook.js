@@ -43,7 +43,10 @@ async function saveEdit(entry, newMsg) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ msg: document.querySelector('#msg').value })
+                body: JSON.stringify({
+                    msg: document.querySelector('#msg').value,
+                    website: document.querySelector('#website').value
+                })
             }
         );
 
@@ -173,7 +176,10 @@ guestbookForm.addEventListener('submit', async (event) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ msg: document.querySelector('#msg').value })
+            body: JSON.stringify({
+                msg: document.querySelector('#msg').value,
+                website: document.querySelector('#website').value
+            })
         });
 
         const data = await response.json().catch(() => ({}));

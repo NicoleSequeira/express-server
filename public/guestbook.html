@@ -27,6 +27,11 @@
         <label for="msg">Message</label>
         <textarea id="msg" name="msg" maxlength="280" required></textarea>
 
+        <div class="hp-field" aria-hidden="true">
+            <label for="website">Leave this field empty</label>
+            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
         <button type="submit">Post</button>
     </form>
     <p id="form-error" role="alert"></p>

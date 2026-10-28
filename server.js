@@ -178,6 +178,34 @@ function startSession(req, user, rememberMe) {
     });
 }
 
+const MIN_FILL_TIME = 2000; // 2 seconds, in milliseconds
+
+// Writes a note about a caught bot to the console and server.log
+function logBot(req, reason) {
+    const line = `[${new Date().toISOString()}] BOT BLOCKED (${reason}) from ${req.ip} on ${req.path}\n`;
+    console.log(line.trim());
+    fs.appendFile(LOG_FILE, line, () => { });
+}
+
+// Blocks bot submissions using a honeypot and a time trap.
+// Bots get a fake "success" so they don't learn they were caught.
+function botCheck(req, res, next) {
+    // Check 1: the honeypot. Humans leave it empty.
+    if (req.body.website) {
+        logBot(req, 'honeypot filled');
+        return res.status(201).json({});
+    }
+
+    // Check 2: the time trap. Humans need more than 2 seconds.
+    const loadedAt = req.session.formLoadedAt;
+    if (!loadedAt || Date.now() - loadedAt < MIN_FILL_TIME) {
+        logBot(req, 'submitted too fast');
+        return res.status(201).json({});
+    }
+
+    next(); // passed both checks
+}
+
 // Route guard for logged-in API routes
 function requireAuth(req, res, next) {
     if (!req.session.userId) {
@@ -188,6 +216,7 @@ function requireAuth(req, res, next) {
 
     next();
 }
+
 
 // Route guard for logged-in pages
 function requireLoginPage(req, res, next) {
@@ -280,9 +309,8 @@ app.get('/api/hello', (req, res) => {
 });
 
 app.get('/guestbook', requireLoginPage, (req, res) => {
-    res.sendFile(
-        path.join(PUBLIC_DIR, 'guestbook.html')
-    );
+    req.session.formLoadedAt = Date.now(); // start the clock
+    res.sendFile(path.join(PUBLIC_DIR, 'guestbook.html'));
 });
 
 // Get all guestbook entries
@@ -341,7 +369,7 @@ app.put('/api/guestbook/:id', requireAuth, async (req, res) => {
 });
 
 // Create a guestbook entry
-app.post('/api/guestbook', requireAuth, async (req, res) => {
+app.post('/api/guestbook', requireAuth, botCheck, async (req, res) => {
     const { msg } = req.body;
     const name = req.session.username;
 

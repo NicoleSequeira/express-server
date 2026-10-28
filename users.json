@@ -33,5 +33,12 @@
     "passwordHash": "$2b$12$sjUZ.xmPIOFsRDsoZ0160.dwOzwu1eAZjPT1K6fSPuvrjwbz9SM2e",
     "role": "user",
     "createdAt": "2026-10-26T16:22:13.121Z"
+  },
+  {
+    "id": "f551e1bb-6622-4238-950e-becb6137073b",
+    "username": "spambot",
+    "passwordHash": "$2b$12$dIFxpeb/JteC62vWXai6geet6geYt8/cF447juBA2ieiwOhQwpe5K",
+    "role": "user",
+    "createdAt": "2026-10-27T17:19:46.773Z"
   }
 ]

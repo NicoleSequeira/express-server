@@ -55,6 +55,8 @@ body>* {
     margin-left: auto;
 }
 
+/* Navigation */
+
 nav {
     display: flex;
     justify-content: center;
@@ -102,6 +104,8 @@ nav a:hover::after {
     transform: scaleX(1);
 }
 
+/* Typography */
+
 h1,
 h2,
 h3 {
@@ -128,8 +132,8 @@ p {
 }
 
 #status {
-    min-height: 32px;
-    margin: 28px auto;
+    min-height: 28px;
+    margin: 22px auto;
     color: var(--pink-700);
     font-weight: 700;
     text-align: center;
@@ -151,6 +155,7 @@ p {
 }
 
 /* Login */
+
 #login-section {
     width: min(100%, 500px);
     margin: 30px auto;
@@ -198,6 +203,7 @@ input[type="checkbox"] {
 }
 
 /* Buttons */
+
 button {
     display: block;
     margin: 10px auto 0;
@@ -256,21 +262,23 @@ textarea:focus-visible {
     outline-offset: 3px;
 }
 
-/* Guestbook box */
+/* Guestbook */
+
 body>#guestbook-section {
-    width: 360px;
-    max-width: calc(100vw - 32px);
-    min-width: 0;
-    margin-right: auto;
-    margin-left: auto;
-    padding: 20px 16px;
-    overflow: hidden;
-    align-self: center;
+    width: min(100%, 500px) !important;
+    max-width: 500px !important;
+    min-width: 0 !important;
+    margin: 30px auto;
+    padding: 30px 26px;
     background: var(--white);
     border: 1px solid var(--border);
-    border-radius: 24px;
+    border-radius: 26px;
     box-shadow: var(--shadow);
     backdrop-filter: blur(12px);
+}
+
+#guestbook-section h2 {
+    margin-bottom: 12px;
 }
 
 #guestbook-form {
@@ -313,25 +321,22 @@ body>#guestbook-section {
     margin-top: 5px;
 }
 
-/* Scrollable posts box */
+/* Guestbook messages */
+
 #guestbook-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
-
     width: 100%;
     max-height: 180px;
     margin: 0 auto;
     padding: 9px;
-
     overflow-y: auto;
     list-style: none;
     text-align: left;
-
     background: rgba(255, 245, 250, 0.65);
     border: 1px solid var(--pink-200);
     border-radius: 14px;
-
     scroll-behavior: smooth;
     scrollbar-color: var(--pink-400) var(--pink-100);
     scrollbar-width: thin;
@@ -339,7 +344,7 @@ body>#guestbook-section {
 
 #guestbook-list:empty::before {
     display: block;
-    padding: 80px;
+    padding: 60px 20px;
     color: var(--muted);
     font-style: italic;
     line-height: 1.5;
@@ -351,8 +356,8 @@ body>#guestbook-section {
 }
 
 #guestbook-list li {
-    flex-shrink: 90px;
-    padding: 19px 13px;
+    flex-shrink: 0;
+    padding: 13px;
     overflow-wrap: anywhere;
     color: var(--text);
     font-size: 0.95rem;
@@ -365,9 +370,10 @@ body>#guestbook-section {
     box-shadow: 0 4px 10px rgba(186, 43, 113, 0.08);
 }
 
-/* Scrollbar for Chrome, Edge, and Safari */
+/* Guestbook scrollbar */
+
 #guestbook-list::-webkit-scrollbar {
-    width: 98px;
+    width: 8px;
 }
 
 #guestbook-list::-webkit-scrollbar-track {
@@ -383,6 +389,16 @@ body>#guestbook-section {
 #guestbook-list::-webkit-scrollbar-thumb:hover {
     background: var(--pink-600);
 }
+
+.hp-field {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* Projects */
 
 #projects-section {
     width: min(100%, 900px);
@@ -411,7 +427,9 @@ body>#guestbook-section {
     border-radius: 22px;
     box-shadow: var(--shadow);
     backdrop-filter: blur(10px);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .project-card:hover {
@@ -439,10 +457,14 @@ body>#guestbook-section {
     color: #ffffff;
     font-weight: 700;
     text-decoration: none;
-    background: linear-gradient(135deg, var(--pink-500), var(--pink-700));
+    background: linear-gradient(135deg,
+            var(--pink-500),
+            var(--pink-700));
     border-radius: 10px;
     box-shadow: 0 8px 18px rgba(223, 63, 135, 0.22);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .project-link:hover {
@@ -501,14 +523,6 @@ body>#guestbook-section {
 #space-form button {
     margin-top: 0;
     padding: 13px 20px;
-}
-
-#status {
-    min-height: 28px;
-    margin: 22px auto;
-    color: var(--pink-700);
-    font-weight: 700;
-    text-align: center;
 }
 
 #result {
@@ -573,7 +587,48 @@ body>#guestbook-section {
     box-shadow: 0 12px 24px rgba(223, 63, 135, 0.3);
 }
 
+/* Responsive layout */
+
+@media (max-width: 750px) {
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .project-card {
+        min-height: auto;
+    }
+}
+
 @media (max-width: 600px) {
+    body {
+        padding: 22px 14px 40px;
+    }
+
+    nav {
+        gap: 10px 18px;
+        padding: 14px 16px;
+    }
+
+    nav a {
+        font-size: 0.92rem;
+    }
+
+    #login-section {
+        width: 100%;
+        padding: 22px 18px;
+    }
+
+    body>#guestbook-section {
+        width: 100% !important;
+        max-width: 500px !important;
+        margin: 22px auto;
+        padding: 22px 18px;
+    }
+
+    #guestbook-list {
+        max-height: 140px;
+    }
+
     #space-form {
         align-items: stretch;
         flex-direction: column;
@@ -601,50 +656,6 @@ body>#guestbook-section {
     }
 
     #nasa-link {
-        width: 100%;
-    }
-}
-
-@media (max-width: 750px) {
-    .projects-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .project-card {
-        min-height: auto;
-    }
-}
-
-/* Mobile layout */
-@media (max-width: 600px) {
-    body {
-        padding: 22px 14px 40px;
-    }
-
-    nav {
-        gap: 10px 18px;
-        padding: 14px 16px;
-    }
-
-    nav a {
-        font-size: 0.92rem;
-    }
-
-    #login-section {
-        width: 100%;
-        padding: 22px 18px;
-    }
-
-    body>#guestbook-section {
-        width: min(360px, calc(100vw - 28px));
-        padding: 18px 14px;
-    }
-
-    #guestbook-list {
-        max-height: 170px;
-    }
-
-    #logout-button {
         width: 100%;
     }
 }

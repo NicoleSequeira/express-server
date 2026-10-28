@@ -12,12 +12,5 @@
     "msg": "Hello",
     "authorId": "bc994826-16d2-4c2d-8e35-907fe267a548",
     "createdAt": "2026-10-26T17:35:54.208Z"
-  },
-  {
-    "id": "6ae27484-df44-46ee-bab7-9e70c9f1d8e6",
-    "name": "riley",
-    "msg": "Hello",
-    "authorId": "771b6184-5b03-4722-9408-aab2c6c448c7",
-    "createdAt": "2026-10-26T17:36:06.423Z"
   }
 ]
